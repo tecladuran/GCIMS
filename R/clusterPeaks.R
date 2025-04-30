@@ -167,6 +167,7 @@ clusterPeaks <- function(
 
 
 peak_and_cluster_metrics <- function(peaks) {
+  message("versió tecla")
   peaks <- peaks |>
     dplyr::mutate(
       dt_length_ms = .data$dt_max_ms - .data$dt_min_ms,
@@ -185,16 +186,12 @@ peak_and_cluster_metrics <- function(peaks) {
     ) |>
     dplyr::group_by(.data$cluster) |>
     dplyr::summarise(
-      dplyr::across(
-        dplyr::all_of(
-          c(
-            "dt_apex_ms", "rt_apex_s",
-            "dt_apex_to_min_ms", "dt_apex_to_max_ms",
-            "rt_apex_to_min_s", "rt_apex_to_max_s"
-          )
-        ),
-        stats::median
-      )
+      dt_apex_ms = stats::median(dt_apex_ms),
+      rt_apex_s = stats::median(rt_apex_s),
+      dt_apex_to_min_ms = stats::quantile(dt_apex_to_min_ms, probs = 0.95, na.rm = TRUE),
+      dt_apex_to_max_ms = stats::quantile(dt_apex_to_max_ms, probs = 0.95, na.rm = TRUE),
+      rt_apex_to_min_s = stats::quantile(rt_apex_to_min_s, probs = 0.95, na.rm = TRUE),
+      rt_apex_to_max_s = stats::quantile(rt_apex_to_max_s, probs = 0.95, na.rm = TRUE)
     ) |>
     dplyr::ungroup() |>
     dplyr::mutate(
